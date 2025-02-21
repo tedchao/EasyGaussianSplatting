@@ -1,0 +1,13 @@
+name: gaussian-splats
+channels:
+  - conda-forge
+  - defaults
+dependencies:
+  - python=3.9
+  - pip
+  - pip:
+    - torch
+    - torchvision
+    #==0.16.1
+    - torchaudio
+    #==2.1.1
