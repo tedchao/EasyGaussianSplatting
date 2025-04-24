@@ -616,6 +616,11 @@ __global__ void project(
     }
 }
 
+__device__ inline float sigmoidf(float x) {
+  return 1.0f / (4.0f + 4.0f * expf(-4.0f * x));
+  //return x;
+}
+
 __global__ void sh2Color(
     int32_t gs_num,
     const float3 *__restrict__ shs,
@@ -649,8 +654,9 @@ __global__ void sh2Color(
 
     // level0
     float3 sh0 = shs[i * sh_dim3 + 0];
-    float3 color = {0.5f, 0.5f, 0.5f};
-    color += SH_C0_0 * sh0;
+    //float3 color = {0.5f, 0.5f, 0.5f};
+    //color += SH_C0_0 * sh0;
+    float3 color = sigmoidf(SH_C0_0) * sh0;
 
     if (sh_dim3 > 1)
     {
@@ -672,7 +678,11 @@ __global__ void sh2Color(
         dc_dsh1 = SH_C1_0 * y;
         dc_dsh2 = SH_C1_1 * z;
         dc_dsh3 = SH_C1_2 * x;
-
+        
+        dc_dsh1 = sigmoidf(dc_dsh1);
+        dc_dsh2 = sigmoidf(dc_dsh2);
+        dc_dsh3 = sigmoidf(dc_dsh3);
+        
         color += dc_dsh1 * sh1 + dc_dsh2 * sh2 + dc_dsh3 * sh3;
 
         if (sh_dim3 > 4)
@@ -695,7 +705,13 @@ __global__ void sh2Color(
             dc_dsh6 = SH_C2_2 * (2.0f * zz - xx - yy);
             dc_dsh7 = SH_C2_3 * xz;
             dc_dsh8 = SH_C2_4 * (xx - yy);
-
+            
+            dc_dsh4 = sigmoidf(dc_dsh4);
+            dc_dsh5 = sigmoidf(dc_dsh5);
+            dc_dsh6 = sigmoidf(dc_dsh6);
+            dc_dsh7 = sigmoidf(dc_dsh7);
+            dc_dsh8 = sigmoidf(dc_dsh8);
+            
             color += dc_dsh4 * sh4 + dc_dsh5 * sh5 + dc_dsh6 * sh6 + dc_dsh7 * sh7 + dc_dsh8 * sh8;
 
             if (sh_dim3 > 9)
@@ -716,7 +732,15 @@ __global__ void sh2Color(
                 dc_dsh13 = SH_C3_4 * x * (4.0f * zz - xx - yy);
                 dc_dsh14 = SH_C3_5 * z * (xx - yy);
                 dc_dsh15 = SH_C3_6 * x * (xx - 3.0f * yy);
-
+                
+                dc_dsh9 = sigmoidf(dc_dsh9);
+                dc_dsh10 = sigmoidf(dc_dsh10);
+                dc_dsh11 = sigmoidf(dc_dsh11);
+                dc_dsh12 = sigmoidf(dc_dsh12);
+                dc_dsh13 = sigmoidf(dc_dsh13);
+                dc_dsh14 = sigmoidf(dc_dsh14);
+                dc_dsh15 = sigmoidf(dc_dsh15);
+                
                 color += dc_dsh9 * sh9 + dc_dsh10 * sh10 + dc_dsh11 * sh11 + dc_dsh12 * sh12 +
                          dc_dsh13 * sh13 + dc_dsh14 * sh14 + dc_dsh15 * sh15;
             }
